@@ -8,11 +8,11 @@ import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-from PyQt5.QtWidgets import (
+from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, 
     QTextEdit, QFileDialog, QProgressBar, QMessageBox, QHBoxLayout, QGraphicsOpacityEffect
 )
-from PyQt5.QtCore import QThread, pyqtSignal, QPropertyAnimation, Qt
+from PySide6.QtCore import QThread, Signal, QPropertyAnimation, Qt
 
 # ---------------------------
 # Checkpoint Functions
@@ -68,11 +68,11 @@ def load_html_content(file_path, salutation, signature):
 # Worker Thread Class
 # ---------------------------
 class EmailSenderWorker(QThread):
-    log_signal = pyqtSignal(str)
-    progress_signal = pyqtSignal(int)
-    finished_signal = pyqtSignal()
-    total_contacts_signal = pyqtSignal(int)
-    emails_sent_signal = pyqtSignal(int)
+    log_signal = Signal(str)
+    progress_signal = Signal(int)
+    finished_signal = Signal()
+    total_contacts_signal = Signal(int)
+    emails_sent_signal = Signal(int)
     
     def __init__(self, excel_file, delay):
         super().__init__()
@@ -143,7 +143,7 @@ class EmailSenderWorker(QThread):
             message["Subject"] = subject
             message["From"] = f"{sender_name} <{sender}>"
             message["To"] = recipient
-            message.attach(MIMEText(email_body, "html"))
+            message.attach(MIMEText(email_body, "html", "utf-8"))
             
             self.log_signal.emit(f"Sending email to {recipient} from {sender_name} (row {i})...")
             
@@ -443,4 +443,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = GmailSenderUI()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
